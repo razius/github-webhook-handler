@@ -1,5 +1,5 @@
 {
-    "puppet/razius": {
+    "razius/puppet": {
         "path": "/home/puppet"
     }
 }
