@@ -29,6 +29,8 @@ def index():
         if not is_github:
             abort(403)
 
+        if request.headers.get('X-GitHub-Event') == "ping":
+            return json.dumps({'msg': 'Hi!'})
         repo_name = json.loads(request.data)['repository']['name']
         repo_owner = json.loads(request.data)['repository']['owner']['name']
         repos = json.loads(io.open('repos.json', 'r').read())
