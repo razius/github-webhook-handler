@@ -1,6 +1,6 @@
 Flask webhook for Github
 ########################
-A very simple github post-receive web hook handler that executes a pull uppon receiving.
+A very simple github post-receive web hook handler that executes per default a pull uppon receiving. The executed action is configurable per repository.
 
 It will also verify that the POST request originated from github.com.
 
@@ -13,7 +13,8 @@ Edit ``repos.json`` to configure repositories, each repository must be registere
 
     {
         "razius/puppet": {
-            "path": "/home/puppet"
+            "path": "/home/puppet",
+            "action": [["git", "pull", "origin", "master"], ],
         }
     }
 
