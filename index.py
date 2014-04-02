@@ -21,20 +21,22 @@ def index():
 
     elif request.method == 'POST':
         # Check if the POST request if from github.com
-        is_github = False
         for block in hook_blocks:
             ip = ipaddress.ip_address(u'%s' % request.remote_addr)
             if ipaddress.ip_address(ip) in ipaddress.ip_network(block):
-                is_github = True
-        if not is_github:
+                break #the remote_addr is within the network range of github
+        else:
             abort(403)
 
         if request.headers.get('X-GitHub-Event') == "ping":
             return json.dumps({'msg': 'Hi!'})
-        repo_name = json.loads(request.data)['repository']['name']
-        repo_owner = json.loads(request.data)['repository']['owner']['name']
+        payload = json.loads(request.data)
+        repo_meta = {
+        	'name': payload['repository']['name'],
+        	'owner': payload['repository']['owner']['name'],
+        	}
         repos = json.loads(io.open('repos.json', 'r').read())
-        repo = repos.get('%s/%s' % (repo_owner, repo_name), None)
+        repo = repos.get('{name}/{owner}'.format(**repo_meta), None)
         if repo and repo.get('path', None):
 	    if repo.get('action', None):
 	        for action in repo['action']:
