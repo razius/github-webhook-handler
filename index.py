@@ -44,9 +44,9 @@ def index():
 	match = re.match(r"refs/heads/(?P<branch>.*)", payload['ref'])
 	if match:
 	    repo_meta['branch'] = match.groupdict()['branch']
-	    repo = repos.get('{name}/{owner}/branch:{branch}'.format(**repo_meta), None)
+	    repo = repos.get('{owner}/{name}/branch:{branch}'.format(**repo_meta), None)
         else:
-	    repo = repos.get('{name}/{owner}'.format(**repo_meta), None)
+	    repo = repos.get('{owner}/{name}'.format(**repo_meta), None)
         if repo and repo.get('path', None):
 	    if repo.get('action', None):
 	        for action in repo['action']:
