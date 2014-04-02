@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import io
 import os
+import re
 import sys
 import json
 import subprocess
@@ -33,13 +34,19 @@ def index():
         if request.headers.get('X-GitHub-Event') != "push":
 	    return json.dumps({'msg': "wrong event type"})
 
+        repos = json.loads(io.open('repos.json', 'r').read())
+
         payload = json.loads(request.data)
         repo_meta = {
 	    'name': payload['repository']['name'],
 	    'owner': payload['repository']['owner']['name'],
 	    }
-        repos = json.loads(io.open('repos.json', 'r').read())
-        repo = repos.get('{name}/{owner}'.format(**repo_meta), None)
+	match = re.match(r"refs/heads/(?P<branch>.*)", payload['ref'])
+	if match:
+	    repo_meta['branch'] = match.groupdict()['branch']
+	    repo = repos.get('{name}/{owner}/branch:{branch}'.format(**repo_meta), None)
+        else:
+	    repo = repos.get('{name}/{owner}'.format(**repo_meta), None)
         if repo and repo.get('path', None):
 	    if repo.get('action', None):
 	        for action in repo['action']:
