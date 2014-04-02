@@ -36,7 +36,12 @@ def index():
         repos = json.loads(io.open('repos.json', 'r').read())
         repo = repos.get('%s/%s' % (repo_owner, repo_name), None)
         if repo and repo.get('path', None):
-            subprocess.Popen(["git", "pull", "origin", "master"],
+	    if repo.get('action', None):
+	        for action in repo['action']:
+		    subprocess.Popen(action,
+                             cwd=repo['path'])
+	    else:
+		subprocess.Popen(["git", "pull", "origin", "master"],
                              cwd=repo['path'])
         return 'OK'
 
