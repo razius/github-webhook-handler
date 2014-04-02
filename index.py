@@ -56,4 +56,7 @@ if __name__ == "__main__":
     except:
         port_number = 80
     is_dev = os.environ.get('ENV', None) == 'dev'
+    if os.environ.get('USE_PROXYFIX', None) == 'true':
+	from werkzeug.contrib.fixers import ProxyFix
+	app.wsgi_app = ProxyFix(app.wsgi_app)
     app.run(host='0.0.0.0', port=port_number, debug=is_dev)
