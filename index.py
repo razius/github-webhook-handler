@@ -30,11 +30,14 @@ def index():
 
         if request.headers.get('X-GitHub-Event') == "ping":
             return json.dumps({'msg': 'Hi!'})
+        if request.headers.get('X-GitHub-Event') != "push":
+	    return json.dumps({'msg': "wrong event type"})
+
         payload = json.loads(request.data)
         repo_meta = {
-        	'name': payload['repository']['name'],
-        	'owner': payload['repository']['owner']['name'],
-        	}
+	    'name': payload['repository']['name'],
+	    'owner': payload['repository']['owner']['name'],
+	    }
         repos = json.loads(io.open('repos.json', 'r').read())
         repo = repos.get('{name}/{owner}'.format(**repo_meta), None)
         if repo and repo.get('path', None):
