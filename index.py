@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import io
 import os
+import re
 import sys
 import json
 import subprocess
@@ -21,20 +22,31 @@ def index():
 
     elif request.method == 'POST':
         # Check if the POST request if from github.com
-        is_github = False
         for block in hook_blocks:
             ip = ipaddress.ip_address(u'%s' % request.remote_addr)
             if ipaddress.ip_address(ip) in ipaddress.ip_network(block):
-                is_github = True
-        if not is_github:
+                break #the remote_addr is within the network range of github
+        else:
             abort(403)
 
         if request.headers.get('X-GitHub-Event') == "ping":
             return json.dumps({'msg': 'Hi!'})
-        repo_name = json.loads(request.data)['repository']['name']
-        repo_owner = json.loads(request.data)['repository']['owner']['name']
+        if request.headers.get('X-GitHub-Event') != "push":
+	    return json.dumps({'msg': "wrong event type"})
+
         repos = json.loads(io.open('repos.json', 'r').read())
-        repo = repos.get('%s/%s' % (repo_owner, repo_name), None)
+
+        payload = json.loads(request.data)
+        repo_meta = {
+	    'name': payload['repository']['name'],
+	    'owner': payload['repository']['owner']['name'],
+	    }
+	match = re.match(r"refs/heads/(?P<branch>.*)", payload['ref'])
+	if match:
+	    repo_meta['branch'] = match.groupdict()['branch']
+	    repo = repos.get('{owner}/{name}/branch:{branch}'.format(**repo_meta), None)
+        else:
+	    repo = repos.get('{owner}/{name}'.format(**repo_meta), None)
         if repo and repo.get('path', None):
 	    if repo.get('action', None):
 	        for action in repo['action']:
@@ -51,4 +63,7 @@ if __name__ == "__main__":
     except:
         port_number = 80
     is_dev = os.environ.get('ENV', None) == 'dev'
+    if os.environ.get('USE_PROXYFIX', None) == 'true':
+	from werkzeug.contrib.fixers import ProxyFix
+	app.wsgi_app = ProxyFix(app.wsgi_app)
     app.run(host='0.0.0.0', port=port_number, debug=is_dev)
