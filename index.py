@@ -11,6 +11,10 @@ from flask import Flask, request, abort
 
 app = Flask(__name__)
 
+# The repos.json file should be readable by the user running the Flask app,
+# and the absolute path should be given by this environment variable.
+REPOS_JSON_PATH = os.environ['FLASK_GITHUB_WEBHOOK_REPOS_JSON']
+
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -18,7 +22,7 @@ def index():
     hook_blocks = requests.get('https://api.github.com/meta').json()['hooks']
 
     if request.method == 'GET':
-        return ' Nothing to see here, move along ...'
+        return ''
 
     elif request.method == 'POST':
         # Check if the POST request if from github.com
@@ -34,7 +38,7 @@ def index():
         if request.headers.get('X-GitHub-Event') != "push":
 	    return json.dumps({'msg': "wrong event type"})
 
-        repos = json.loads(io.open('repos.json', 'r').read())
+        repos = json.loads(io.open(REPOS_JSON_PATH, 'r').read())
 
         payload = json.loads(request.data)
         repo_meta = {
