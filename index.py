@@ -21,7 +21,7 @@ REPOS_JSON_PATH = os.environ['FLASK_GITHUB_WEBHOOK_REPOS_JSON']
 def index():
 
     if request.method == 'GET':
-        return 'gh-hooks'
+        return 'OK'
 
     elif request.method == 'POST':
         # Store the IP address blocks that github uses for hook requests.
