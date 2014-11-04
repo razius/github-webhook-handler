@@ -29,6 +29,13 @@ Install dependencies.
 
     pip install -r requirements.txt
 
+    
+Set environment variable for the ``repos.json`` config.
+
+.. code-block:: console
+
+    export FLASK_GITHUB_WEBHOOK_REPOS_JSON=/path/to/repos.json
+
 Start the server.
 
 .. code-block:: console
