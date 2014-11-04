@@ -8,6 +8,7 @@ import subprocess
 import requests
 import ipaddress
 from flask import Flask, request, abort
+from werkzeug.contrib.fixers import ProxyFix
 
 app = Flask(__name__)
 app.debug = os.environ.get('DEBUG') == 'true'
