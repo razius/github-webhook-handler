@@ -7,6 +7,7 @@ import json
 import subprocess
 import requests
 import ipaddress
+from hmac import new as hmac
 from flask import Flask, request, abort
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -60,6 +61,14 @@ def index():
                repo = repos.get('{owner}/{name}'.format(**repo_meta), None)
 
         if repo and repo.get('path', None):
+            # Check if POST request signature is valid
+            key = repos.get('key', None)
+            if key:
+                signature = request.headers.get('X-Hub-Signature').split('=')[1]
+                mac = hmac(key, msg=request.data, digestmod=sha1)
+                if mac.hexdigest() != signature:
+                    abort(403)
+
             if repo.get('action', None):
                 for action in repo['action']:
                     subp = subprocess.Popen(action,
