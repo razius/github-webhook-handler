@@ -62,7 +62,7 @@ def index():
 
         if repo and repo.get('path', None):
             # Check if POST request signature is valid
-            key = repos.get('key', None)
+            key = repo.get('key', None)
             if key:
                 signature = request.headers.get('X-Hub-Signature').split('=')[1]
                 mac = hmac(key, msg=request.data, digestmod=sha1)
