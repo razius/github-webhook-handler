@@ -7,7 +7,8 @@ import json
 import subprocess
 import requests
 import ipaddress
-from hmac import new as hmac
+import hmac
+from hashlib import sha1
 from flask import Flask, request, abort
 from werkzeug.contrib.fixers import ProxyFix
 
@@ -65,9 +66,12 @@ def index():
             key = repo.get('key', None)
             if key:
                 signature = request.headers.get('X-Hub-Signature').split('=')[1]
-                mac = hmac(key, msg=request.data, digestmod=sha1)
-                if mac.hexdigest() != signature:
+                if type(key) == unicode:
+                    key = key.encode()
+                mac = hmac.new(key, msg=request.data, digestmod=sha1)
+                if not compare_digest(mac.hexdigest(), signature):
                     abort(403)
+
 
             if repo.get('action', None):
                 for action in repo['action']:
@@ -75,6 +79,30 @@ def index():
                              cwd=repo['path'])
                     subp.wait()
         return 'OK'
+
+#Check if python version is less than 2.7.7
+if sys.version_info<(2,7,7):
+    #http://blog.turret.io/hmac-in-go-python-ruby-php-and-nodejs/
+    def compare_digest(a, b):
+	    """
+	    ** From Django source **
+
+	    Run a constant time comparison against two strings
+
+	    Returns true if a and b are equal.
+
+	    a and b must both be the same length, or False is
+	    returned immediately
+	    """
+	    if len(a) != len(b):
+		    return False
+
+	    result = 0
+	    for ch_a, ch_b in zip(a, b):
+		    result |= ord(ch_a) ^ ord(ch_b)
+	    return result == 0
+else:
+    compare_digest = hmac.compare_digest
 
 if __name__ == "__main__":
     try:
