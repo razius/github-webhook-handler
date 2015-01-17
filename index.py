@@ -36,19 +36,23 @@ REPOS_JSON_PATH = os.environ['FLASK_GITHUB_WEBHOOK_REPOS_JSON']
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-
     if request.method == 'GET':
         return 'OK'
-
     elif request.method == 'POST':
-        # Store the IP address blocks that github uses for hook requests.
-        hook_blocks = requests.get('https://api.github.com/meta').json()[
-            'hooks']
+        # Store the IP address of the requester
+        request_ip = ipaddress.ip_address(u'{0}'.format(request.remote_addr))
 
-        # Check if the POST request if from github.com
+        # If GHE_ADDRESS is specified, use it as the hook_blocks.
+        if os.environ.get('GHE_ADDRESS', None):
+            hook_blocks = [os.environ.get('GHE_ADDRESS')]
+        # Otherwise get the hook address blocks from the API.
+        else:
+            hook_blocks = requests.get('https://api.github.com/meta').json()[
+                'hooks']
+
+        # Check if the POST request is from github.com or GHE
         for block in hook_blocks:
-            ip = ipaddress.ip_address(u'%s' % request.remote_addr)
-            if ipaddress.ip_address(ip) in ipaddress.ip_network(block):
+            if ipaddress.ip_address(request_ip) in ipaddress.ip_network(block):
                 break  # the remote_addr is within the network range of github.
         else:
             abort(403)
