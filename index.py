@@ -93,10 +93,10 @@ def index():
                 if not compare_digest(mac.hexdigest(), signature):
                     abort(403)
 
-            if repo.get('action', None):
-                for action in repo['action']:
-                    subp = subprocess.Popen(action, cwd=repo['path'])
-                    subp.wait()
+        if repo.get('action', None):
+            for action in repo['action']:
+                subp = subprocess.Popen(action, cwd=repo.get('path', '.'))
+                subp.wait()
         return 'OK'
 
 # Check if python version is less than 2.7.7
