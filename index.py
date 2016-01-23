@@ -31,7 +31,7 @@ app.debug = os.environ.get('DEBUG') == 'true'
 
 # The repos.json file should be readable by the user running the Flask app,
 # and the absolute path should be given by this environment variable.
-REPOS_JSON_PATH = os.environ['FLASK_GITHUB_WEBHOOK_REPOS_JSON']
+REPOS_JSON_PATH = os.environ['REPOS_JSON_PATH']
 
 
 @app.route("/", methods=['GET', 'POST'])
