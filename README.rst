@@ -31,13 +31,13 @@ registered under the form ``GITHUB_USER/REPOSITORY_NAME``.
         "razius/puppet": {
             "path": "/home/puppet",
             "key": "MyVerySecretKey",
-            "action": [["git", "pull", "origin", "master"], ],
+            "action": [["git", "pull", "origin", "master"]]
         },
         "d3non/somerandomexample/branch:live": {
 	    "path": "/home/exampleapp",
             "key": "MyVerySecretKey",
 	    "action": [["git", "pull", "origin", "live"],
-		["echo", "execute", "some", "commands", "..."] ]
+		["echo", "execute", "some", "commands", "..."]]
 	}
     }
 
@@ -64,6 +64,12 @@ Start the server.
 
     python index.py 80
 
+Start the server with root privileges, if required, while preserving existing environment variables.
+
+.. code-block:: console
+
+    sudo -E python index.py 80
+
 Start the server behind a proxy (see:
 http://flask.pocoo.org/docs/deploying/wsgi-standalone/#proxy-setups)
 
@@ -80,4 +86,4 @@ Start the server to be used with a GitHub Enterprise instance.
 
 Go to your repository's settings on `github.com <http://github.com>`_ or your
 GitHub Enterprise instance and register your public URL under
-``Service Hooks -> WebHook URLs``.
+``Webhooks & services -> Webhooks``.
