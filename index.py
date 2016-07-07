@@ -44,7 +44,7 @@ def index():
 
         # If GHE_ADDRESS is specified, use it as the hook_blocks.
         if os.environ.get('GHE_ADDRESS', None):
-            hook_blocks = [os.environ.get('GHE_ADDRESS')]
+            hook_blocks = [unicode(os.environ.get('GHE_ADDRESS'))]
         # Otherwise get the hook address blocks from the API.
         else:
             hook_blocks = requests.get('https://api.github.com/meta').json()[
