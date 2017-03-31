@@ -55,7 +55,8 @@ def index():
             if ipaddress.ip_address(request_ip) in ipaddress.ip_network(block):
                 break  # the remote_addr is within the network range of github.
         else:
-            abort(403)
+            if str(request_ip) != '127.0.0.1':                 
+                abort(403)            
 
         if request.headers.get('X-GitHub-Event') == "ping":
             return json.dumps({'msg': 'Hi!'})
