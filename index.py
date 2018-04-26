@@ -42,21 +42,24 @@ def index():
         # Store the IP address of the requester
         request_ip = ipaddress.ip_address(u'{0}'.format(request.remote_addr))
 
-        # If GHE_ADDRESS is specified, use it as the hook_blocks.
-        if os.environ.get('GHE_ADDRESS', None):
-            hook_blocks = [unicode(os.environ.get('GHE_ADDRESS'))]
-        # Otherwise get the hook address blocks from the API.
-        else:
-            hook_blocks = requests.get('https://api.github.com/meta').json()[
-                'hooks']
+        # If VALIDATE_SOURCEIP is set to false, do not validate source IP
+        if os.environ.get('VALIDATE_SOURCEIP', None) != 'false':
 
-        # Check if the POST request is from github.com or GHE
-        for block in hook_blocks:
-            if ipaddress.ip_address(request_ip) in ipaddress.ip_network(block):
-                break  # the remote_addr is within the network range of github.
-        else:
-            if str(request_ip) != '127.0.0.1':                 
-                abort(403)            
+            # If GHE_ADDRESS is specified, use it as the hook_blocks.
+            if os.environ.get('GHE_ADDRESS', None):
+                hook_blocks = [unicode(os.environ.get('GHE_ADDRESS'))]
+            # Otherwise get the hook address blocks from the API.
+            else:
+                hook_blocks = requests.get('https://api.github.com/meta').json()[
+                    'hooks']
+
+            # Check if the POST request is from github.com or GHE
+            for block in hook_blocks:
+                if ipaddress.ip_address(request_ip) in ipaddress.ip_network(block):
+                    break  # the remote_addr is within the network range of github.
+            else:
+                if str(request_ip) != '127.0.0.1':
+                    abort(403)
 
         if request.headers.get('X-GitHub-Event') == "ping":
             return json.dumps({'msg': 'Hi!'})
