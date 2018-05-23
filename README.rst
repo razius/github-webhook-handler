@@ -1,3 +1,10 @@
+NOTE
+####
+
+I do not maintain this project and it should only be used as an example.
+
+The following might be a better implrementation: https://github.com/carlos-jenkins/python-github-webhooks
+
 Flask webhook for Github
 ########################
 A very simple github post-receive web hook handler that executes per default a
