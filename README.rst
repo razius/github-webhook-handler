@@ -3,7 +3,10 @@ NOTE
 
 I do not maintain this project and it should only be used as an example.
 
-The following might be a better implrementation: https://github.com/carlos-jenkins/python-github-webhooks
+The following might be a better implrementation: 
+
+- https://github.com/carlos-jenkins/python-github-webhooks
+- https://github.com/bloomberg/python-github-webhook
 
 Flask webhook for Github
 ########################
